@@ -1,5 +1,43 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 <script>
-	
+	var socket = io.connect('http://localhost:8080');
+	// on connection to server, ask for a suer name with an anonymous callback
+
+	socket.on('connect', function() {
+		// call server side function adduser and send one paramater 
+		socket.emit('adduser', prompt('What\'s your name?'));
+	});
+
+	// listener, whenever the server emits updatechat 
+	socket.on('updatechat', function(username, data) {
+		$("#conversation").append('<b>' + username + ':</b> ' + data + '<br>');
+	})
+
+	// listener, when the server emits 'updateusers' this updates username list
+	socket.on('updateusers', function(data) {
+		$('#users').empty();
+		$.each(data, function(key, value) {
+			$('#users').append('<div>' + key + '</div>');
+		});
+	});
+
+	// on load of page
+	$(function() {
+		// when client clicks send
+		$("#datasend").click(function() {
+			var message = $('#data').val();
+			$('#data').val(' ');
+			// tell server to execute sendchat
+			socket.emit('sendchat', message);
+		});
+
+		// when client hits enter on their keyboard
+		$('#data').keypress(function(e) {
+			if(e.which == 13) { // return key
+ 				$(this).blur();
+ 				$('#datasend').focus().click();
+			}
+		});
+	})
 </script>
