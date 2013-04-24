@@ -1,17 +1,21 @@
-var app = require('express').createServer()
-var io = require('socket.io').listen(app);
-
-app.listen(8080);
+var express = require('express'),	
+	http = require('http'),
+	app = express(),
+	server = http.createServer(app),
+	io = require('socket.io').listen(server);
 
 // routing
 
-app.get('/', function (req, res) {
+app.get("/", function(req, res) {
 	res.sendfile(__dirname + '/index.html');
 });
+
+server.listen(3000);
 
 var usernames = {};
 
 io.sockets.on('connection', function(socket) {
+
 	// when the client emits sendchat, this listens and executes
 	socket.on('sendchat', function(data) {
 		// tell the client to execute updatechat with 2 paramaters
